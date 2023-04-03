@@ -1,0 +1,9 @@
+aller montée
+aide
+regarder
+retour
+aller sud
+manger
+aller nord
+reculer
+quitter
