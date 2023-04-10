@@ -64,5 +64,5 @@ public class Item
     public String getItemDescription()
     {
         return "Il y a un " + this.getName() + " à prendre... " + " " + this.getDescription() + ". " + "Cet objet pèse " + this.getWeight() + " g.";
-    }
+    }//getItemDescription()
 }//Item()

@@ -1,5 +1,4 @@
 import java.util.HashMap;
-
 /**
  * Classe Room - un lieu du jeu d'aventure Zuul.
  * 
@@ -17,7 +16,7 @@ public class Room
     private HashMap<String, Room> aExits;//HashMap ("direction", pièce dans cette direction)
     public static final Room UNKNOWN_ROOM = new Room("Pas de pièce", null);
     private String aImageName;//Nom de l'image
-    private HashMap <String, Item> aItems; //HashMap ("Nom de l'objet", objet)
+    private ItemList aRoomItems;
     
     /**
      * Constructeur naturel
@@ -31,9 +30,34 @@ public class Room
         this.aDescription = pDescription; 
         this.aImageName = pImageName;
         this.aExits = new HashMap<String, Room>(); //Créer un nouveau HashMap vide 
-        this.aItems = new HashMap<String, Item>(); //Créer un nouveau HashMap vide
+        this.aRoomItems = new ItemList("La pièce");
     }//Room()
     
+    /**
+     * Accesseur de l'item de la pièce
+     * 
+     * @return L'item de la pièce
+     */
+    public ItemList getRoomItems()
+    {
+        return this.aRoomItems;
+    }//getRoomItems()
+    
+    /** 
+     * 
+     */
+    public void addItem(final Item pItem)
+    {
+        this.aRoomItems.addItem(pItem.getName(), pItem);
+    }//addItem()
+    
+    /**
+     * 
+     */
+    public void removeItem(final Item pItem)
+    {
+        this.aRoomItems.removeItem(pItem.getName());
+    }//removeItem()
     
     /**
      * Accesseur de la description
@@ -44,49 +68,7 @@ public class Room
     public String getShortDescription(){
         return this.aDescription;
     }//getShortDescription()
-    
-    /**
-     * Accesseur de l'item
-     * 
-     * @param pItem Clef de l'item à récupérer
-     * @return L'item lié à la clef
-     */
-    public Item getItem(final String pItem)
-    {
-        return this.aItems.get(pItem);
-    }//getItem()
-    
-    /**
-     * Accesseur de la chaîne de caractères de l'item.
-     * Envoie une chaîne de carctères de tous les items de la pièce
-     * 
-     * @return Chaîne de caractères avec les items
-     */
-    public String getItemString()
-    {
-          if(this.aItems.isEmpty()) {
-            return "Il n'y aucun objets dans cette pièce";
-        }//if
-    
-        StringBuilder returnString = new StringBuilder ("Les items sont : ");
-        for(Item vI : aItems.values())
-        {
-            returnString.append("\n").append(vI.getItemDescription()).append("\n");
-        }
-        return returnString.toString();
-    }//getItemString()
-    
-    /**
-     * Ajoute un item à la HashMap
-     * 
-     * @param pName Clef de la HashMap (nom de l'item)
-     * @param pItem Item à ajouter dans la HashMap
-     */
-    public void addItem(final String pName, final Item pItem)
-    {
-        this.aItems.put(pName, pItem);
-    }//addItem()
-    
+       
     /**
      * Définit une sortie de cette pièce dans la direction indiquée.
      * 
@@ -140,8 +122,8 @@ public class Room
      */
     public String getLongDescription()
     {
-        return "Vous êtes dans "+ this.aDescription + ".\n" + getExitString() + ".\n" + getItemString();
-    }//getLongDescription
+        return "Vous êtes dans "+ this.aDescription + ".\n" + getExitString() + ".\n" + this.aRoomItems.getInventoryString();
+    }//getLongDescription()
     
     /**
      * Retourne une chaîne de caractères décrivant le nom de l'image de la pièce 

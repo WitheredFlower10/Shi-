@@ -1,3 +1,4 @@
+import javax.swing.JOptionPane;
 /**
  * Classe Game - le moteur du jeu d'aventure.
  * Cette classe est le moteur principal du jeu.
@@ -23,8 +24,16 @@ public class Game
      */
     public Game()
     {
-        this.aEngine = new GameEngine();
+        //Demande un Pseudo à l'utilisateur 
+        String vPseudo = "";
+        while(vPseudo.length() == 0) {
+            vPseudo = JOptionPane.showInputDialog("Quel est votre pseudo ?");
+            
+        }
+        
+        this.aEngine = new GameEngine(vPseudo);
         this.aGui = new UserInterface( this.aEngine);
         this.aEngine.setGUI( this.aGui );
     }//Game()
+   
 }//Game()

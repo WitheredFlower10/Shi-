@@ -20,18 +20,31 @@ public class GameEngine
     private UserInterface aGui;//Interface visuelle
     private HashMap<String, Room> aRooms;
     private Player aPlayer;
-
+    private String aName;
+    private ItemList aInventory;
     
     /**
      * Constructeur par défaut pour les objets de la classe GameEngine
      */ 
-    public GameEngine()
+    public GameEngine(final String pPseudo)
     {
+        this.aName = pPseudo;
         this.aParser = new Parser();
         this.aRooms = new HashMap<String, Room>();
         this.createRooms();
+        this.aPlayer = new Player(aName,this.aRooms.get("Karesansui"), this);
     }//GameEngine()
     
+    /**
+     * Accesseur de l'interface
+     * 
+     * @return L'interface
+     */
+    public UserInterface getGUI() 
+    {
+        return this.aGui;
+    }//getGUI()
+        
     /**
      * Procédure qui permet de modifier la valeur de l'interface et utilise printWelcome
      * Démarre l'interface graphique
@@ -41,7 +54,7 @@ public class GameEngine
     public void setGUI( final UserInterface pUserInterface )
     {
         this.aGui = pUserInterface;
-        this.printWelcome();
+        this.printWelcome();         
     }//setGUI()
 
     /**
@@ -50,6 +63,7 @@ public class GameEngine
     private void printWelcome()
     {
     this.aGui.print( "\n" );
+    this.aGui.println("Bonjour " + this.aPlayer.getPseudo() + "!");
     this.aGui.println( "Bienvenue dans Shi : Kiyowara Fumiaki's Adventure !" );
     this.aGui.println( "Shi : Kiyowara Fumiaki's Adventure est un nouveau et incroyable jeu d'aventure." );
     this.aGui.println( "Essayer 'aide' si vous avez besoin d'aide." );
@@ -127,10 +141,7 @@ public class GameEngine
         
         //Sortie de la cuisine
         vKuri.setExit("nord",vMi_do);
-        
-        //Initialisation de la salle de début du jeu
-        this.aPlayer = new Player("Sseldeen",vKaresansui);
-        
+                
         //Stockage des pièces
         this.aRooms.put("Karesansui",vKaresansui);
         this.aRooms.put("Chinjusha",vChinjusha);
@@ -158,15 +169,15 @@ public class GameEngine
         Item vHetH = new Item ("Hitatare et hakama","Il s'agit d'un costume traditionnel japonais porté par les hommes. Le hitatare est une veste ample portée sur un pantalon et le hakama est une jupe-culotte ample portée par-dessus.",3000);
         
         //Placement des Items dans la pièce
-        vKaresansui.addItem("Jinbaori",vJinbaori);
-        vKyozo.addItem("Livre Torii, temples et sanctuaires japonais",vLivreTorii);
-        vKyozo.addItem("Livre Shinto",vLivreShinto);
-        vYakushi_do.addItem("Livre Promenades Japonaises",vLivrePJap);
-        vDojo_1.addItem("Sauce Soja",vSauce);
-        vKuri.addItem("Sobas",vSobas);
-        vKuri.addItem("Saké",vSake);
-        vHojo.addItem("Kote",vKote);
-        vKairo.addItem("Hitatare et hakama",vHetH);
+        vKaresansui.addItem(vJinbaori);
+        vKyozo.addItem(vLivreTorii);
+        vKyozo.addItem(vLivreShinto);
+        vYakushi_do.addItem(vLivrePJap);
+        vDojo_1.addItem(vSauce);
+        vKuri.addItem(vSobas);
+        vKuri.addItem(vSake);
+        vHojo.addItem(vKote);
+        vKairo.addItem(vHetH);   
     }//createRooms()
         
     /**
@@ -189,7 +200,8 @@ public class GameEngine
         String vCommandWord = vCommand.getCommandWord();
         switch(vCommandWord){
             case "aller":
-                this.goRoom(vCommand);
+                this.aPlayer.goRoom(vCommand);
+                this.printLocationInfo();
                 break;
             case "quitter":
                 this.quitter(vCommand);
@@ -198,16 +210,23 @@ public class GameEngine
                 this.printAide();
                 break;
             case "regarder":
-                this.look(); 
+                this.aPlayer.look();
                 break;
             case "manger" :
-                this.eat();
+                this.aPlayer.eat();
                 break;
             case "reculer" :
-                this.back(vCommand);
+                this.aPlayer.back(vCommand);
+                this.printLocationInfo();
                 break;
             case "test":
                 this.test(vCommand);
+                break;
+            case "prendre" :
+                this.aPlayer.take(vCommand);
+                break;
+            case "jeter" : 
+                this.aPlayer.drop(vCommand);
                 break;
         }//switch
     }//interpretCommand()
@@ -220,43 +239,6 @@ public class GameEngine
     this.aGui.println("Vous êtes perdu. Vous êtes seul.\nVous vous baladez dans le temple de Shizue. \n\n Les commandes disponibles sont :\n"); 
     this.aGui.println(this.aParser.getCommandString());
     }//printAide()
-    
-    /**
-     * Procédure permettant de se déplacer de pièces en pièces
-     * 
-     * @param pDirectionSouhaite Direction dans laquelle le joueur souhaite se rendre
-     */
-    private void goRoom(final Command pDirectionSouhaite)
-    {
-        if(!pDirectionSouhaite.hasSecondWord()){
-            this.aGui.println("Où aller") ;   
-            return;//Arrête la fonction prématurément car l'on n'a pas besoin de changer de pièce
-        }//if
-        //vérifie si la commande est une direction valide ou non et indique au joueur si la Direction est Inconnue
-        if(this.aPlayer.getCurrentRoom() == Room.UNKNOWN_ROOM)
-        {
-            this.aGui.println("Direction Inconnue");
-            return;//Arrête la fonction prématurément car l'on n'a pas besoin de changer de pièce
-        }//if
-        //Indique au joueur s'il n'y a pas de sorties 
-        String vDirection = pDirectionSouhaite.getSecondWord();
-        if (this.aPlayer.getCurrentRoom().getExit(vDirection) == null)
-        {
-            this.aGui.println("Il n'y a pas de portes!");
-        } 
-        this.aPlayer.goRoom(vDirection);
-        printLocationInfo();//Affiche les informations sur la pièce
-    }//goRoom()
-    
-    /**
-    * Affiche les sorties possibles de la pièce courante
-    */
-    private void printLocationInfo()
-    {
-    this.aGui.println(this.aPlayer.getCurrentRoom().getLongDescription());
-    if( this.aPlayer.getCurrentRoom().getImageName() != null)
-                this.aGui.showImage( this.aPlayer.getCurrentRoom().getImageName());
-    }//printLocationInfo()
     
     /**
      * Termine le jeu
@@ -289,20 +271,14 @@ public class GameEngine
     }//quitter()    
     
     /**
-     * Procédure qui affiche ce qu'il y a dans la pièce, la description et les sorties
-     */
-    private void look()
+    * Affiche les sorties possibles de la pièce courante
+    */
+    private void printLocationInfo()
     {
-        this.aGui.println(this.aPlayer.getCurrentRoom().getLongDescription());
-    }//look()
-    
-    /**
-     * Proédure qui affiche un message une fois que le joueur a mangé quelque chose
-     */
-    private void eat()
-    {
-        this.aGui.println("Vous avez mangé et vous êtes rassasié");
-    }//eat()
+    this.aGui.println(this.aPlayer.getCurrentRoom().getLongDescription());
+    if( this.aPlayer.getCurrentRoom().getImageName() != null)
+                this.aGui.showImage( this.aPlayer.getCurrentRoom().getImageName());
+    }//printLocationInfo()
     
     /**
      * Accesseur.Récupère une pièce par rapport à une description donnée.
@@ -314,28 +290,6 @@ public class GameEngine
     {
         return this.aRooms.get(pDescription);
     }//getRoom()
-    
-    /** 
-     * Permet de revenir en arrière, dans la pièce précédente
-     * 
-     * @param pCommand Commande de l'utilisateur
-     */
-    private void back(final Command pCommand)
-    {
-        //Vérifie si la commande entrée a bien un second mot
-        if(pCommand.hasSecondWord()){
-            this.aGui.println("Je ne comprends pas cette commande, utilisez un seul mot.");
-            return; // Arrêt prématuré
-        }//if
-        //Vérifie s'il y a une pièce précédente
-        if(this.aPlayer.getPreviousRoom().isEmpty())
-        {
-            this.aGui.println("Il n'y a pas de pièces précédentes.");
-            return;//Arrêt prématuré
-        }//if
-        this.aPlayer.back();
-        this.printLocationInfo();//Affiche les informations de la pièce actuelle
-    }//back()
     
     /**
      * Méthode de test
