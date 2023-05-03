@@ -6,6 +6,7 @@ import java.util.HashMap;
  * reliée à d'autres pièces par des sorties.  Pour chaque sortie existante, la pièce 
  * stocke une référence à la pièce voisine.
  * Cette classe permet définir les pièces de notre jeu et leurs sorties possibles
+ * 
  * @author HAKIM Justine
  * @version 15/02/2023
  */
@@ -14,15 +15,17 @@ public class Room
     //Attributs de la classe
     private String aDescription;//Description de la pièce actuelle
     private HashMap<String, Room> aExits;//HashMap ("direction", pièce dans cette direction)
-    public static final Room UNKNOWN_ROOM = new Room("Pas de pièce", null);
-    private String aImageName;//Nom de l'image
-    private ItemList aRoomItems;
+    public static final Room UNKNOWN_ROOM = new Room("Pas de pièce", null);//Constante d'une pièce inconnue
+    private String aImageName;//Nom de l'image  
+    private ItemList aRoomItems;//Liste d'objets présents dans la pièce
+    private HashMap<String, Door> aDoors; // Stocke les portes de la pièce
     
     /**
      * Constructeur naturel
      * Crée une pièce décrite par la chaine "description"
      * Au départ, il n'existe aucune sortie
      * "description" est une chaîne
+     * 
      * @param pDescription Description de la pièce 
      * @param pImageName Nom de l'image de la pièce
      */
@@ -30,7 +33,8 @@ public class Room
         this.aDescription = pDescription; 
         this.aImageName = pImageName;
         this.aExits = new HashMap<String, Room>(); //Créer un nouveau HashMap vide 
-        this.aRoomItems = new ItemList("La pièce");
+        this.aDoors = new HashMap<String, Door>();
+        this.aRoomItems = new ItemList (); 
     }//Room()
     
     /**
@@ -43,32 +47,17 @@ public class Room
         return this.aRoomItems;
     }//getRoomItems()
     
-    /** 
-     * 
-     */
-    public void addItem(final Item pItem)
-    {
-        this.aRoomItems.addItem(pItem.getName(), pItem);
-    }//addItem()
-    
-    /**
-     * 
-     */
-    public void removeItem(final Item pItem)
-    {
-        this.aRoomItems.removeItem(pItem.getName());
-    }//removeItem()
-    
     /**
      * Accesseur de la description
      * 
      * @return La description de la pièce actuelle
      * (telle que définie par le constructeur).
      */
-    public String getShortDescription(){
+    public String getShortDescription()
+    {
         return this.aDescription;
     }//getShortDescription()
-       
+    
     /**
      * Définit une sortie de cette pièce dans la direction indiquée.
      * 
@@ -86,8 +75,9 @@ public class Room
      * Renvoie la pièce atteinte si nous nous déplaçons dans la direction "direction"
      * S'il n'y a pas de pièces dans cette direction, alors on renvoie null. 
      * Acceseurs d'une des sorties
+     * 
      * @param pDirection Direction dont on souhaite connaître la sortie 
-     * @return la sortie indiquée
+     * @return L'objet Room accessible dans la direction donnée, ou UNKNOWN_ROOM si la direction n'est pas valide
      */
     public Room getExit(final String pDirection)
     {
@@ -112,20 +102,22 @@ public class Room
             returnString.append( " " + vS );
         return returnString.toString();
     }//getExitString()
-    
+     
     /**
      * Renvoie une description détaillée de cette pièce sous la forme :
-     * Vous êtes dans (pièce).
+     * Vous etes dans (pièce).
      * Sorties : nord sud.
+     * Les objets dans cette pièce sont : (items)
      * 
-     * @return Une description de la pièce, ainsi que les sorties 
+     * @return Une description de la pièce, ainsi que les sorties, ainsi que les items de la pièce
      */
     public String getLongDescription()
     {
-        return "Vous êtes dans "+ this.aDescription + ".\n" + getExitString() + ".\n" + this.aRoomItems.getInventoryString();
+        return "Vous êtes dans "+ this.aDescription + "\n" + this.getExitString() + "\n" + "Les objets dans cette pièce sont :" + this.aRoomItems.getItemString();
     }//getLongDescription()
     
     /**
+     * Le nom de l'image est stocké dans l'attribut aImageName de la classe Room.
      * Retourne une chaîne de caractères décrivant le nom de l'image de la pièce 
      * @return String qui décrit le nom de l'image de la pièce
      */
@@ -133,4 +125,22 @@ public class Room
     {
         return this.aImageName;
     }//getImageName()
+    
+    /**
+     * Fonction booléenne qui vérifie si la pièce est acccessible
+     * 
+     * @param pRoom Pièce dont on vérifie l'accessibilité
+     * @return Vrai si la pièce est une sortie possible, Faux dans le cas contraire
+     */
+    public boolean isExit (final Room pRoom) {
+        return pRoom.aExits.containsValue(this);
+    }//isExit()
+
+    public void addDoor(final String pDirection, final Door pDoor){
+        this.aDoors.put(pDirection, pDoor);
+    }//addDoor()
+    
+    public Door getDoor(final String pDirection){
+        return this.aDoors.get(pDirection);
+    }
 }// Room

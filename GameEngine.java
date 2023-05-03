@@ -21,10 +21,12 @@ public class GameEngine
     private HashMap<String, Room> aRooms;
     private Player aPlayer;
     private String aName;
-    private ItemList aInventory;
+    private HashMap<String, Door> aDoors;
     
     /**
      * Constructeur par défaut pour les objets de la classe GameEngine
+     * 
+     * @param pPseudo Le pseudo du joueur
      */ 
     public GameEngine(final String pPseudo)
     {
@@ -32,6 +34,7 @@ public class GameEngine
         this.aParser = new Parser();
         this.aRooms = new HashMap<String, Room>();
         this.createRooms();
+        this.aDoors = new HashMap<String,Door>();
         this.aPlayer = new Player(aName,this.aRooms.get("Karesansui"), this);
     }//GameEngine()
     
@@ -63,13 +66,15 @@ public class GameEngine
     private void printWelcome()
     {
     this.aGui.print( "\n" );
-    this.aGui.println("Bonjour " + this.aPlayer.getPseudo() + "!");
-    this.aGui.println( "Bienvenue dans Shi : Kiyowara Fumiaki's Adventure !" );
-    this.aGui.println( "Shi : Kiyowara Fumiaki's Adventure est un nouveau et incroyable jeu d'aventure." );
-    this.aGui.println( "Essayer 'aide' si vous avez besoin d'aide." );
+    this.aGui.println( "Bienvenue " + this.aPlayer.getPseudo() + " dans Shi : Kiyowara Fumiaki's Adventure !" );
+    this.aGui.println( "Shi : Kiyowara Fumiaki's Adventure est un nouveau jeu d'aventure dans lequel " + this.aPlayer.getPseudo() + " va devoir récupérer Shi, le katana légendaire de sa descendance.");
+    this.aGui.println( "Il va falloir que " + this.aPlayer.getPseudo() + " ramasse une armure complète de samouraï afin de remporter le combat contre celui qui a volé son katana." );
+    this.aGui.println( "Taper 'aller + direction' pour changer de pièce ou bien utiliser les flèches directionnelles.");
+    this.aGui.println( "Essayer 'aide' si vous en avez besoin." );
+    this.aGui.println(this.aPlayer.getPseudo() + " peut encore faire "+ this.aPlayer.getMaxDeplacements() + " déplacements avant que le jeu prenne fin.");
     this.aGui.print( "\n" );
     this.printLocationInfo();
-    }//printWelcome()     
+    }//printWelcome()
     
     /**
      * Procédure permettant de créer les différentes pièces du jeu 
@@ -90,10 +95,16 @@ public class GameEngine
         Room vDojo_2 = new Room("la pièce qui historiquement était la salle du temple religieux. Cette grande salle a aussi été utilisée par la suite pour l'enseignement des arts martiaux. Le dojo est un lieu où l'on progresse. Cette progression est obligatoirement supervisée et contrôlée parun maître.", "./Images/Dojo_2.png");
         Room vMi_do = new Room("un bâtiment dans lequel est vénérée une statue sacrée. ", "./Images/Mi_do.png");
         Room vKuri = new Room("un bâtiment abritant les cuisines du temple.","./Images/Kuri.png");
+        Room vGateFront = new Room("les portes devant Hokke do", "./Images/Gate.png");
+        
+        Item vClé = new Item ("Clé", "Il s'agit d'une clé qui permet d'ouvrir une porte vérouillée", 10);
+        vHojo.getRoomItems().addItem("Clé", vClé);
+        Door vGate = new Door("Porte de Hokke do", "./Images/Gate.png", vClé);
+
         
         //Sorties du Jardin
         vKaresansui.setExit("montée",vKairo);
-        vKaresansui.setExit("ouest", vHokke_do);
+        vKaresansui.setExit("ouest", vGate);
         vKaresansui.setExit("est", vChinjusha);
         
         //Sortie du Sanctuaire
@@ -115,7 +126,11 @@ public class GameEngine
         vHojo.setExit("ouest", vHatto);
         
         //Sortie de la salle de Méditation
-        vHokke_do.setExit("est",vKaresansui);
+        vHokke_do.setExit("est",vGateFront);
+        
+        //Sortie de la door
+        vGate.setExit("est",vKaresansui);
+        vGate.setExit("ouest", vGateFront);
         
         //Sorties du long Passage 
         vKairo.setExit("descente",vKaresansui);
@@ -137,7 +152,6 @@ public class GameEngine
         
         //Sorties du Batîment dans lequel est vénérée une statue sacrée
         vMi_do.setExit("nord",vDojo_2);
-        vMi_do.setExit("sud",vKuri);
         
         //Sortie de la cuisine
         vKuri.setExit("nord",vMi_do);
@@ -159,25 +173,27 @@ public class GameEngine
         
         //Création des Items
         Item vJinbaori = new Item ("Jinbaori","C'est un manteau court traditionnel japonais porté par les samouraïs pendant la période Edo (1603-1868). Il est fabriqué à partir de tissus épais et imperméables et est souvent orné de motifs colorés. Le jinbaori était souvent porté par-dessus le hitatare et le hakama pour fournir une couche supplémentaire de protection contre les éléments lors des batailles.",600);
-        Item vLivreTorii = new Item("Livre Torii, temples et sanctuaires japonais", "Entre bande dessinée et carnet de voyage, ce livre plein d'humour et très documenté vous dit tout sur les sanctuaires shintoïstes, les temples bouddhistes et sur la place du sacré dans la vie des Japonais.", 500);
-        Item vLivreShinto = new Item("Livre Shinto", "C'est un livre sur la religion shintoïste, qui est la religion traditionnelle du Japon.",500);        
-        Item vLivrePJap = new Item("Livre Promenades Japonaises","C'est un livre sur les promenades dans les endroits historiques et touristiques du Japon.",500);
-        Item vSauce = new Item ("Sauce Soja","C'est une sauce salée et légèrement sucrée d'origine japonaise, faite à partir de soja, de blé, d'eau et de sel.",200);
+        Item vLivreTorii = new Item("Livre.Torii", "Entre bande dessinée et carnet de voyage, ce livre plein d'humour et très documenté vous dit tout sur les sanctuaires shintoïstes, les temples bouddhistes et sur la place du sacré dans la vie des Japonais.", 500);
+        Item vLivreShinto = new Item("Livre.Shinto", "C'est un livre sur la religion shintoïste, qui est la religion traditionnelle du Japon.",500);        
+        Item vLivrePJap = new Item("Livre.Promenades.Japonaises","C'est un livre sur les promenades dans les endroits historiques et touristiques du Japon.",500);
+        Item vSauce = new Item ("Sauce.Soja","C'est une sauce salée et légèrement sucrée d'origine japonaise, faite à partir de soja, de blé, d'eau et de sel.",200);
         Item vSobas = new Item ("Sobas","Ce sont des nouilles fines et grises, généralement faites à partir de farine de sarrasin, consommées chaudes ou froides au Japon.",100);
         Item vSake = new Item ("Saké","C'est une boisson alcoolisée japonaise traditionnelle, fabriquée à partir de riz fermenté.",700);
         Item vKote = new Item ("Kote","Ce sont des gants de protection utilisés dans les arts martiaux japonais",350);      
-        Item vHetH = new Item ("Hitatare et hakama","Il s'agit d'un costume traditionnel japonais porté par les hommes. Le hitatare est une veste ample portée sur un pantalon et le hakama est une jupe-culotte ample portée par-dessus.",3000);
+        Item vHetH = new Item ("Hitatare.et.hakama","Il s'agit d'un costume traditionnel japonais porté par les hommes. Le hitatare est une veste ample portée sur un pantalon et le hakama est une jupe-culotte ample portée par-dessus.",3000);
+        Beamer vBeamer = new Beamer("Shukkô.ki", "Il s'agit d'un objet qui permet de se téléporter dans une pièce précédemment chargée.",300);
         
         //Placement des Items dans la pièce
-        vKaresansui.addItem(vJinbaori);
-        vKyozo.addItem(vLivreTorii);
-        vKyozo.addItem(vLivreShinto);
-        vYakushi_do.addItem(vLivrePJap);
-        vDojo_1.addItem(vSauce);
-        vKuri.addItem(vSobas);
-        vKuri.addItem(vSake);
-        vHojo.addItem(vKote);
-        vKairo.addItem(vHetH);   
+        vKaresansui.getRoomItems().addItem("Jinbaori", vJinbaori);
+        vKyozo.getRoomItems().addItem("Livre.Torii", vLivreTorii);
+        vKyozo.getRoomItems().addItem("Livre.Shinto", vLivreShinto);
+        vYakushi_do.getRoomItems().addItem("Livre.Promenades.Japonaises", vLivrePJap);
+        vDojo_1.getRoomItems().addItem("Sauce.Soja", vSauce);
+        vKuri.getRoomItems().addItem("Sobas", vSobas);
+        vKuri.getRoomItems().addItem("Saké", vSake);
+        vHojo.getRoomItems().addItem("Kote", vKote);
+        vKairo.getRoomItems().addItem("Hitatare.et.hakama", vHetH);
+        vKairo.getRoomItems().addItem("Shukkô.ki", vBeamer);
     }//createRooms()
         
     /**
@@ -185,7 +201,7 @@ public class GameEngine
      * Transforme et analyse la commande de l'utilisateur
      * 
      * @param pCommandLine Commande écrite par le joueur
-     * @return Vrai si le joueur veut arrêter le jeu, Faux s'il veut le continuer
+     *  Vrai si le joueur veut arreter le jeu, Faux s'il veut le continuer
      */
     public void interpretCommand( final String pCommandLine ) 
     {
@@ -210,13 +226,13 @@ public class GameEngine
                 this.printAide();
                 break;
             case "regarder":
-                this.aPlayer.look();
+                this.aPlayer.look(vCommand);
                 break;
-            case "manger" :
-                this.aPlayer.eat();
+            case "ingérer" :
+                this.aPlayer.eat(vCommand);
                 break;
             case "reculer" :
-                this.aPlayer.back(vCommand);
+                this.aPlayer.back();
                 this.printLocationInfo();
                 break;
             case "test":
@@ -228,6 +244,15 @@ public class GameEngine
             case "jeter" : 
                 this.aPlayer.drop(vCommand);
                 break;
+            case "inventaire":
+                this.aPlayer.inventory();
+                break;
+            case "charger" :
+                this.aPlayer.charge(vCommand);
+                break;
+            case "décharger" :
+                this.aPlayer.fire(vCommand);
+                break;
         }//switch
     }//interpretCommand()
 
@@ -236,19 +261,41 @@ public class GameEngine
      */
     private void printAide() 
     {  
-    this.aGui.println("Vous êtes perdu. Vous êtes seul.\nVous vous baladez dans le temple de Shizue. \n\n Les commandes disponibles sont :\n"); 
+    this.aGui.println("\n" + this.aPlayer.getPseudo() + " se balade dans le temple de Shizue. \n\n Les commandes disponibles sont :\n"); 
     this.aGui.println(this.aParser.getCommandString());
+    this.aGui.println("Taper 'aller + direction' pour changer de pièce.");
+    this.aGui.println("Taper 'quitter' si " + this.aPlayer.getPseudo() + " veut arrêter son aventure.");
+    this.aGui.println("Taper 'regarder' si " + this.aPlayer.getPseudo() + " veut regarder ce qu'il se passe dans les environs...");
+    this.aGui.println("Taper 'regarder' + le nom de l'objet dans l'inventaire de " + this.aPlayer.getPseudo() + " pour obtenir sa description." );
+    this.aGui.println("Taper 'ingérer + nom de l'objet' si  " + this.aPlayer.getPseudo() + " veut manger.");
+    this.aGui.println("Taper 'reculer' si "+ this.aPlayer.getPseudo() + "veut retourner dans la pièce précédente.");
+    this.aGui.println("Taper 'prendre + nom de l'objet' si "+ this.aPlayer.getPseudo() + " veut ramasser un objet de la pièce.");
+    this.aGui.println("Taper 'jeter + nom de l'objet' si " + this.aPlayer.getPseudo() + " veut jeter un objet de son inventaire.");
+    this.aGui.println("Taper 'inventaire' si " + this.aPlayer.getPseudo() + " veut voir le contenu de celui-ci.");
+    this.aGui.println(this.aPlayer.getPseudo() + " peut encore faire "+ this.aPlayer.getMaxDeplacements() + " déplacements avant que le jeu prenne fin.");
     }//printAide()
+    
+    /**
+     * Procédure qui vérifie si le compteur de déplacements n'a pas atteint 0
+     * 
+     * Si le compteur de déplacements est à 0 alors le jeu s'arrête
+     */
+    public void timerEnd() {
+        if(this.aPlayer.getMaxDeplacements() == 0){
+            JOptionPane.showInternalMessageDialog(null,this.aPlayer.getPseudo() + " a fait trop de déplacements et a perdu.", "Message d'au revoir", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
+        }//if()
+    }//timerEnd()
     
     /**
      * Termine le jeu
      */
     private void endGame() 
     {
-        int exit = JOptionPane.showConfirmDialog(null,"Êtes-vous sûr de vouloir quitter? :/","Quitter?",JOptionPane.YES_NO_OPTION);
+        int exit = JOptionPane.showConfirmDialog(null,"" + this.aPlayer.getPseudo() + ". Êtes-vous sûr de vouloir quitter? :/","Quitter?",JOptionPane.YES_NO_OPTION);
         if (exit == JOptionPane.YES_OPTION)
             {
-                JOptionPane.showInternalMessageDialog(null,"Merci d'avoir joué au jeu, au revoir !", "Message d'au revoir", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showInternalMessageDialog(null,"Merci d'avoir joué au jeu " + this.aPlayer.getPseudo() + ". Au revoir !", "Message d'au revoir", JOptionPane.INFORMATION_MESSAGE);
                 System.exit(0);
             }else {
             this.aGui.enable(true); 
@@ -259,7 +306,7 @@ public class GameEngine
      * Méthode qui permet de quitter le jeu 
      * 
      * @param pCommand Commande rentrée par le joueur
-     * @return Vrai si le joueur écrit "quitter", Faux s'il y a un second mot rentré par le joueur
+     *  Vrai si le joueur ecrit "quitter", Faux s'il y a un second mot rentre par le joueur
      */
     private void quitter(final Command pCommand) 
     {
@@ -273,7 +320,7 @@ public class GameEngine
     /**
     * Affiche les sorties possibles de la pièce courante
     */
-    private void printLocationInfo()
+    public void printLocationInfo()
     {
     this.aGui.println(this.aPlayer.getCurrentRoom().getLongDescription());
     if( this.aPlayer.getCurrentRoom().getImageName() != null)
@@ -316,4 +363,19 @@ public class GameEngine
             this.aGui.println("Désolé, le ficher " + vFile + " n'a pas été trouvé. Réessayer");
         }
     }//test()
+    
+    /**
+     * 
+     */
+    public void goTo(final Room pRoom) {
+        this.aGui.println(this.aPlayer.goTo(pRoom));
+        this.printLocationInfo();
+    }
+    
+    /**
+     * 
+     */
+    public HashMap <String, Door> getDoors() {
+        return this.aDoors;
+    }
 }//GameEngine()

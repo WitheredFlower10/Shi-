@@ -1,4 +1,4 @@
- /**
+/**
  * Cette classe est la classe principale du jeu d'aventure. 
  *  
  * Cette classe contient un tableau d'énumeration de toutes les commandes disponibles dans le jeu. 
@@ -10,7 +10,7 @@
 public class CommandWords
 {
     //Tableau constant qui contiendra les commandes valides
-    private static final String[] aValidCommands = {"aller","aide","quitter","regarder","manger","reculer", "test","prendre","jeter"};
+    private static final String[] aValidCommands = {"aller","aide","quitter","regarder","ingérer","reculer", "test","prendre","jeter","inventaire","charger","décharger"};
 
     /**
      * Vérifie si une chaîne de caractères est une commande valide. 

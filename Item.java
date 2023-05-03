@@ -9,7 +9,7 @@ public class Item
     // variables d'instance
     private String aName;
     private String aDescription;
-    private double aWeight;
+    private double aItemWeight;
 
     /**
      * Constructeur naturel d'objets de classe Item
@@ -23,7 +23,7 @@ public class Item
         // initialisation des variables d'instance
         this.aName = pName;
         this.aDescription = pDescription;
-        this.aWeight = pWeight;
+        this.aItemWeight = pWeight;
     }//Item()
     
     /**
@@ -53,7 +53,7 @@ public class Item
      */
     public double getWeight()
     {
-        return this.aWeight;
+        return this.aItemWeight;
     }//getWeight()
     
     /** 

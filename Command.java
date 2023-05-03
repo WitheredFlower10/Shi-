@@ -6,10 +6,10 @@
  * 
  * 
  * La façon dont cela est utilisé est la suivante : les commandes sont déjà vérifiées pour être des mots de commande valides.
- * Si l'utilisateur a saisi une commande non valide (un mot qui n'est pas
- * connu), le mot de commande est alors <null>.
+ * Si l'utilisateur a saisi une commande non valide (un mot qui n'est pas connu), le mot de commande est alors nul.
+ * 
  *
- * Si la commande ne comporte qu'un seul mot, le deuxième mot est <null>.
+ * Si la commande ne comporte qu'un seul mot, le deuxieme mot est nul.
  * @author HAKIM Justine 
  * @version 15/02/2023
  */
@@ -45,7 +45,7 @@ public class Command
     /**
      * Accesseur de la description de commande
      * 
-     * @return l'attribut du deuxième mot de commande
+     * @return L'attribut du deuxième mot de commande
      */
     public String getSecondWord()
     {

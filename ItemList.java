@@ -1,22 +1,24 @@
 import java.util.HashMap;
-import java.util.Set;
 /**
  * Classe ItemList
  * 
- * Cette classe permet de gérer une liste d'items et ainsi mutualiser la gestion des items qui se retrouvait dupliquée dans Room et dans Player.
+ * La classe ItemList permet de gérer une liste d'items et mutualise ainsi la gestion des items qui se retrouvait dupliquée dans Room et dans Player. 
+ * Cette classe utilise une HashMap pour stocker les objets, avec le nom de l'objet comme clef et l'objet lui-même comme valeur associée.
+ * Cette classe possède des méthodes pour ajouter et supprimer des items, récupérer un item par son nom, récupérer la liste complète des items sous forme de chaîne de caractères, et récupérer la HashMap des objets présents dans l'inventaire.
+ * Cette classe est utilisée par les classes Room et Player pour gérer les objets qui se trouvent dans une pièce ou dans l'inventaire du joueur.
  *
  * @author HAKIM Justine
  * @version 10/04/2023
  */
 public class ItemList
 {
-    // variables d'instance
+    // variables d'instance 
     private HashMap <String, Item> aItems;//HashMap ("Nom de l'objet", objet)
 
     /**
      * Constructeur d'objets de classe ItemList
      */
-    public ItemList(final String pLocation)
+    public ItemList()
     {
         // initialisation des variables d'instance
         this.aItems = new HashMap <String, Item>() ;
@@ -24,9 +26,10 @@ public class ItemList
     
     /**
      * Accesseur de l'item
+     * Cette méthode permet d'accéder à l'objet "Item" stocké dans la HashMap en fonction de la clé "pItem".
      * 
-     * @param pItem Clef de l'item à récupérer
-     * @return L'item lié à la clef
+     * @param pItem Clef de l'item à récupérer dans la HashMap
+     * @return L'objet "Item" lié à la clef "pItem"
      */
     public Item getItem(final String pItem)
     {
@@ -34,9 +37,9 @@ public class ItemList
     }//getItem()
     
      /**
-     * Accesseur permettant de récupérer la HashMap des objets présent dans le sac
+     * Accesseur permettant d'accéder à la HashMap des objets présents dans la liste d'items.
      * 
-     * @return Inventaire
+     * @return La HashMap des objets présents dans la liste d'items. L'inventaire.
      */
     public HashMap <String, Item> getItemsInventory()
     {
@@ -44,29 +47,10 @@ public class ItemList
     }//getItemsInventory()
     
     /**
-     * Accesseur de la chaîne de caractères de l'item.
-     * Envoie une chaîne de caractères de tous les items de la pièce
-     * 
-     * @return Chaîne de caractères avec les items
-     */
-    public String getInventoryString() 
-    {
-        if(this.aItems.isEmpty())
-        {
-            return "Ton inventaire est vide, il ne contient aucun objets...";
-        }//if
-        StringBuilder returnString = new StringBuilder ("Les objets dans votre inventaire sont les suivants :");
-        for(Item vItem : this.aItems.values()){
-            returnString.append("\n").append(vItem.getItemDescription());
-        }//for()
-        return returnString.toString();
-    }//getInventoryString()
-    
-    /**
-     * Ajoute un item à la HashMap
-     * 
-     * @param pName Clef de la HashMap (nom de l'item)
-     * @param pItem Item à ajouter dans la HashMap
+     * Ajoute un objet "Item "à la liste en l'associant à la clé "pName"
+     *      
+     * @param pName Clef de la HashMap associée à l'objet "Item" à ajouter (nom de l'item)
+     * @param pItem L'objet "Item" à ajouter dans la HashMap
      */
     public void addItem(final String pName, final Item pItem)
     {
@@ -74,12 +58,41 @@ public class ItemList
     }//addItem()
     
     /**
-     * Supprime un Item de notre HashMap
+     * Supprime un objet "Item" de notre HashMap, de la liste en utilisant la clé "pName".
      * 
-     * @param pName Nom de l'Item
+     * @param pName La clé associée à l'objet "Item" à supprimer de la liste.   
+     * @param pItem L'objet "Item" à supprimer de la liste.
      */
-    public void removeItem(final String pName)
+    public void removeItem(final String pName, final Item pItem)
     {
-        this.aItems.remove(pName);
+        this.aItems.remove(pName, pItem);
     }//removeItem()
+    
+     /**
+     * Teste si la liste contient l'item demandé.
+     */
+    public boolean hasItem(final String pNom)
+    {
+        return this.aItems.containsKey(pNom);
+    }
+    
+    /**
+     * Accesseur d'une chaîne de caractères représentant tous les objets "Item" stockés dans la liste.
+     *  
+     * @return Une chaîne de caractères représentant les objets "Item" stockés dans la liste. 
+     * Si la liste est vide, la méthode renvoie "Désolé...Il n'y a pas d'objets...".
+     */
+    public String getItemString()
+    {
+        StringBuilder returnString = new StringBuilder ();
+        if(this.aItems.isEmpty())
+        {
+            returnString.append("Désolé...Il n'y a pas d'objets...");
+        } else {
+        for(String vItemName : this.aItems.keySet()){
+            returnString.append(" " + vItemName + " - ");
+        }//for()
+        }//else if
+        return returnString.toString();
+    }//getItemString()
 }//ItemList()

@@ -1,5 +1,4 @@
 import java.util.StringTokenizer;
-
 /** 
  * Cet analyseur lit les entrées de l'utilisateur et essaie de les interpréter comme une commande.
  * Chaque fois qu'il est appelé, il lit une ligne du terminal et tente de l'interpréter comme une commande.
@@ -17,7 +16,7 @@ public class Parser
     private CommandWords aValidCommands;  // Commande valide
     
     /**
-     * Constructeur par defaut qui cree les 2 objets prevus pour les attributs
+     * Constructeur par defaut qui cree l'objet prévu pour l'attribut aValidCommands
      */
     public Parser() 
     {
@@ -65,6 +64,5 @@ public class Parser
     public String getCommandString() 
     {
         return this.aValidCommands.getCommandList();
-    }//getCommandString()
-    
+    }//getCommandString()   
 } // Parser
